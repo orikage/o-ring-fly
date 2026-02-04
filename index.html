@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O-ring fly | Endfield Tactical Terminal v5.0</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+    <style>
+        :root {
+            --ak-yellow: #ffd700;
+            --ak-yellow-dim: rgba(255, 215, 0, 0.2);
+            --ak-bg: #050505;
+            --ak-text: #ffffff;
+            --ak-text-dim: #888;
+            --ak-cyan: #00e5ff;
+        }
+
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0;
+            background-color: var(--ak-bg);
+            color: var(--ak-text);
+            font-family: 'Inter', -apple-system, sans-serif;
+            overflow-x: hidden;
+            height: 100%;
+        }
+
+        /* --- THREE.JS CANVAS (BACKGROUND + MIDDLEGROUND) --- */
+        #canvas-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        /* --- V3 STYLE OVERLAY (BACKGROUND NOISE) --- */
+        .scanline {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100px;
+            background: linear-gradient(to bottom, transparent, var(--ak-yellow-dim), transparent);
+            opacity: 0.1;
+            z-index: 5;
+            pointer-events: none;
+            animation: scan 12s linear infinite;
+        }
+
+        @keyframes scan {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(100vh); }
+        }
+
+        /* --- V3 STYLE CONTENT LAYER (MIDDLEGROUND) --- */
+        .layer-middle {
+            position: relative;
+            z-index: 20;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .layer-middle {
+                flex-direction: row;
+                justify-content: flex-start;
+                padding-left: 10%;
+            }
+        }
+
+        .content-panel {
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            border-left: 3px solid var(--ak-yellow);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%);
+            animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-30px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .title {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 900;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            line-height: 0.85;
+        }
+
+        .data-label {
+            font-family: monospace;
+            font-size: 10px;
+            color: var(--ak-yellow);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        /* --- V3 STYLE HUD ELEMENTS (FOREGROUND) --- */
+        .hud-ui {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .corner {
+            position: absolute;
+            width: 40px; height: 40px;
+            border: 1px solid var(--ak-text-dim);
+        }
+        @media (min-width: 768px) {
+            .corner { width: 80px; height: 80px; }
+        }
+        .tl { top: 15px; left: 15px; border-right: 0; border-bottom: 0; }
+        .br { bottom: 15px; right: 15px; border-left: 0; border-top: 0; }
+
+        .system-info {
+            position: absolute;
+            top: 20px; right: 20px;
+            text-align: right;
+            font-family: monospace;
+            font-size: clamp(8px, 2vw, 11px);
+            color: var(--ak-cyan);
+            line-height: 1.4;
+        }
+
+        .nav-menu {
+            position: absolute;
+            bottom: 40px; left: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: auto;
+        }
+
+        .nav-item {
+            font-weight: 900;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            color: var(--ak-text-dim);
+        }
+        .nav-item:hover {
+            color: var(--ak-yellow);
+            padding-left: 10px;
+        }
+        .nav-item::before {
+            content: "";
+            width: 0; height: 2px;
+            background: var(--ak-yellow);
+            margin-right: 0;
+            transition: all 0.2s;
+        }
+        .nav-item:hover::before {
+            width: 20px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <div class="scanline"></div>
+
+    <div class="layer-middle">
+        <div class="content-panel">
+            <div class="data-label">// PRTS TERMINAL_LINK: OK</div>
+            <h1 class="title">O-RING<br>FLY</h1>
+            <div style="background: var(--ak-yellow); color: black; padding: 2px 10px; font-weight: bold; display: inline-block; margin-top: 10px; font-size: 12px;">TACTICAL_PORTFOLIO_V5</div>
+            
+            <p style="color: #aaa; font-size: 14px; margin-top: 30px; line-height: 1.8;">
+                情報の深淵を3D空間として表現しつつ、<br>
+                従来の「タクティカル・ミニマリズム」を前景に統合。<br>
+                エンドフィールドの機能美をWeb技術で再構築する。
+            </p>
+        </div>
+    </div>
+
+    <div class="hud-ui">
+        <div class="corner tl"></div>
+        <div class="corner br"></div>
+        <div class="system-info">
+            SYSTEM_TIME: 15:26:42<br>
+            LAT: 35.6895° N [REDACTED]<br>
+            LON: 139.6917° E [REDACTED]<br>
+            SIGNAL: ENCRYPTED // STABLE
+        </div>
+    </div>
+
+    <nav class="nav-menu">
+        <div class="nav-item">Operations</div>
+        <div class="nav-item">Personnel</div>
+        <div class="nav-item">Infrastructure</div>
+        <div class="nav-item">Archives</div>
+    </nav>
+
+    <script>
+        // --- THREE.JS SCENE SETUP ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        // --- BACKGROUND TERRAIN (Endfield Style) ---
+        const geometry = new THREE.PlaneGeometry(120, 120, 60, 60);
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0xffd700, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.08
+        });
+        
+        const pos = geometry.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+            const x = pos.getX(i);
+            const y = pos.getY(i);
+            pos.setZ(i, Math.sin(x * 0.15) * Math.cos(y * 0.15) * 2.5);
+        }
+        
+        const terrain = new THREE.Mesh(geometry, material);
+        terrain.rotation.x = -Math.PI / 2.2;
+        terrain.position.y = -8;
+        scene.add(terrain);
+
+        // --- DYNAMIC DATA CLOUD ---
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2500;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for(let i=0; i<particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 80;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.06,
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.3
+        });
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        camera.position.set(0, 0, 20);
+
+        // --- INTERACTION ---
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        // --- ANIMATION LOOP ---
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.005;
+
+            terrain.position.z = (time * 5) % 4;
+            particlesMesh.rotation.y += 0.0003;
+
+            // Smooth camera reaction
+            camera.position.x += (mouseX * 4 - camera.position.x) * 0.03;
+            camera.position.y += (mouseY * 2 - camera.position.y) * 0.03;
+            camera.lookAt(0, 0, 0);
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
