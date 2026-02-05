@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  portfolio:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: o-ring-fly
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ── Cloudflare Tunnel (optional) ────────────────────────────────
+  # Uncomment and set CLOUDFLARE_TOKEN to enable tunnel.
+  # tunnel:
+  #   image: cloudflare/cloudflared:latest
+  #   container_name: o-ring-fly-tunnel
+  #   command: tunnel --metrics 0.0.0.0:9969 run
+  #   environment:
+  #     - CLOUDFLARE_TOKEN=${CLOUDFLARE_TOKEN}
+  #   volumes:
+  #     - ./cloudflared:/etc/cloudflared
+  #   depends_on:
+  #     - portfolio
+  #   restart: unless-stopped

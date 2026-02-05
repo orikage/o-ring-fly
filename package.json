@@ -1,0 +1,15 @@
+{
+  "name": "o-ring-fly",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run src/index.tsx",
+    "start": "bun run src/index.tsx",
+    "build": "bun build src/index.tsx --outdir ./dist"
+  },
+  "dependencies": {
+    "hono": "^4.7.0",
+    "marked": "^15.0.0"
+  },
+  "devDependencies": {}
+}
