@@ -1,0 +1,18 @@
+{
+  "name": "o-ring-fly",
+  "version": "1.0.0",
+  "description": "O-ring fly Portfolio — Hono × Bun × Docker",
+  "scripts": {
+    "dev": "bun run src/index.tsx",
+    "start": "bun run src/index.tsx",
+    "build:css": "npx tailwindcss -i src/style.css -o public/style.css --watch"
+  },
+  "dependencies": {
+    "hono": "^4.6.0",
+    "marked": "^14.0.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.0.0",
+    "@types/bun": "latest"
+  }
+}
