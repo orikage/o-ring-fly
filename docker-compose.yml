@@ -1,0 +1,18 @@
+services:
+  portfolio:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+    restart: unless-stopped
+
+  # Cloudflare Tunnel — 実用時は uncomment して設定する
+  # cloudflared:
+  #   image: cloudflare/cloudflared:latest
+  #   command: tunnel --config /etc/cloudflared run
+  #   volumes:
+  #     - ~/.cloudflared:/etc/cloudflared:ro
+  #   depends_on:
+  #     - portfolio
+  #   restart: unless-stopped
