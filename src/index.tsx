@@ -16,6 +16,10 @@ const SRC_DIR = resolve(import.meta.dir);
 // Serve /public/* files (CSS, images moved to public/)
 app.get("/public/*", (c) => {
   const path = resolve(PUBLIC_DIR, c.req.param("*"));
+  // Prevent path traversal: ensure resolved path is within PUBLIC_DIR
+  if (!path.startsWith(PUBLIC_DIR + "/") && path !== PUBLIC_DIR) {
+    return c.notFound();
+  }
   if (!existsSync(path)) return c.notFound();
   const ext = path.split(".").pop() || "";
   const mimeTypes: Record<string, string> = {
@@ -36,7 +40,12 @@ app.get("/public/*", (c) => {
 
 // Serve /content/resource/* — 記事リソース（画像など）を src/content/resource/ から配信
 app.get("/content/resource/*", (c) => {
-  const resourcePath = resolve(SRC_DIR, "content", "resource", c.req.param("*"));
+  const RESOURCE_DIR = resolve(SRC_DIR, "content", "resource");
+  const resourcePath = resolve(RESOURCE_DIR, c.req.param("*"));
+  // Prevent directory escape: ensure resolved path is within RESOURCE_DIR
+  if (!resourcePath.startsWith(RESOURCE_DIR + "/") && resourcePath !== RESOURCE_DIR) {
+    return c.notFound();
+  }
   if (!existsSync(resourcePath)) return c.notFound();
   const ext = resourcePath.split(".").pop() || "";
   const mimeTypes: Record<string, string> = {
