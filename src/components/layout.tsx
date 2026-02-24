@@ -37,6 +37,9 @@ export function Layout({ children, title = "O-ring fly" }: { children: string; t
     <a href="/content" class="nav-item" style="font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:2px;color:#888;text-decoration:none;display:flex;align-items:center;transition:all 0.2s;cursor:pointer;"
        onmouseover="this.style.color='#ffd700';this.style.paddingLeft='10px'"
        onmouseout="this.style.color='#888';this.style.paddingLeft='0'">Archives</a>
+    <a href="/photos" class="nav-item" style="font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:2px;color:#888;text-decoration:none;display:flex;align-items:center;transition:all 0.2s;cursor:pointer;"
+       onmouseover="this.style.color='#ffd700';this.style.paddingLeft='10px'"
+       onmouseout="this.style.color='#888';this.style.paddingLeft='0'">Photos</a>
   </nav>
 
   <!-- Page content -->

@@ -3,7 +3,9 @@ import { Layout } from "./components/layout";
 import { HomePage } from "./components/home";
 import { ContentListPage } from "./components/content-list";
 import { ArticlePage } from "./components/article";
+import { PhotosPage } from "./components/photos";
 import { getAllArticles, getArticle } from "./content";
+import { getAllPhotos } from "./photos";
 import { readFileSync, existsSync } from "fs";
 import { resolve } from "path";
 
@@ -75,6 +77,11 @@ app.get("/", (c) => {
 app.get("/content", (c) => {
   const articles = getAllArticles();
   return c.html(Layout({ children: ContentListPage(articles), title: "Archives" }));
+});
+
+app.get("/photos", (c) => {
+  const photos = getAllPhotos();
+  return c.html(Layout({ children: PhotosPage(photos), title: "Photos" }));
 });
 
 app.get("/content/:slug", async (c) => {
