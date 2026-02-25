@@ -1,0 +1,5 @@
+node_modules/
+bun.lockb
+public/style.css
+src/__test_storage__/
+src/__test_galleries__/

@@ -1,0 +1,475 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== Arknights Tactical Design System ===== */
+:root {
+  --ak-bg: #0d0d0d;
+  --ak-bg-sub: #141414;
+  --ak-bg-panel: rgba(10, 10, 10, 0.92);
+  --ak-yellow: #ffd700;
+  --ak-yellow-dim: rgba(255, 215, 0, 0.15);
+  --ak-yellow-glow: 0 0 12px rgba(255, 215, 0, 0.6);
+  --ak-cyan: #00e5ff;
+  --ak-cyan-dim: rgba(0, 229, 255, 0.1);
+  --ak-text: #ffffff;
+  --ak-text-dim: #888888;
+  --ak-text-muted: #444444;
+  --ak-border: #222222;
+  --ak-border-dim: rgba(255, 255, 255, 0.06);
+}
+
+/* ===== Scanline effect ===== */
+.scanline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  background: linear-gradient(to bottom, transparent, var(--ak-yellow-dim), transparent);
+  opacity: 0.15;
+  z-index: 5;
+  pointer-events: none;
+  animation: scan 10s linear infinite;
+}
+
+@keyframes scan {
+  from { transform: translateY(-100%); }
+  to   { transform: translateY(100vh); }
+}
+
+/* ===== Masonry layout (CSS columns / aspect-ratio preserved) ===== */
+.masonry-grid {
+  columns: 1;
+  column-gap: 2px;
+}
+
+@media (min-width: 640px) {
+  .masonry-grid { columns: 2; }
+}
+
+@media (min-width: 1024px) {
+  .masonry-grid { columns: 3; }
+}
+
+@media (min-width: 1440px) {
+  .masonry-grid { columns: 4; }
+}
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 2px;
+  display: block;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.masonry-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+/* ===== Glitch hover effect ===== */
+.masonry-item::before,
+.masonry-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 2;
+}
+
+/* Chromatic aberration (Red channel shift) */
+.masonry-item::before {
+  background: rgba(255, 0, 0, 0.08);
+  mix-blend-mode: screen;
+}
+
+/* Chromatic aberration (Cyan channel shift) */
+.masonry-item::after {
+  background: rgba(0, 229, 255, 0.06);
+  mix-blend-mode: screen;
+}
+
+.masonry-item:hover img {
+  transform: scale(1.02);
+}
+
+.masonry-item:hover::before {
+  opacity: 1;
+  animation: glitch-red 0.3s infinite;
+}
+
+.masonry-item:hover::after {
+  opacity: 1;
+  animation: glitch-cyan 0.3s 0.05s infinite;
+}
+
+@keyframes glitch-red {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-2px) translateY(1px); }
+  40%  { transform: translateX(2px); }
+  60%  { transform: translateX(-1px) translateY(-1px); }
+  80%  { transform: translateX(1px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes glitch-cyan {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(2px) translateY(-1px); }
+  50%  { transform: translateX(-2px); }
+  75%  { transform: translateX(1px) translateY(1px); }
+  100% { transform: translateX(0); }
+}
+
+/* ===== Image hover overlay ===== */
+.masonry-item .overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+}
+
+.masonry-item:hover .overlay {
+  opacity: 1;
+}
+
+/* ===== 45-degree diagonal divider ===== */
+.diagonal-divider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.diagonal-divider::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: calc(35% - 20px);
+  width: 40px;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    transparent calc(50% - 1px),
+    var(--ak-yellow) calc(50% - 1px),
+    var(--ak-yellow) calc(50% + 1px),
+    transparent calc(50% + 1px),
+    transparent 100%
+  );
+  box-shadow: var(--ak-yellow-glow);
+}
+
+/* ===== HUD corners ===== */
+.hud-corner-tl {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  width: 40px;
+  height: 40px;
+  border-top: 1px solid #555;
+  border-left: 1px solid #555;
+  pointer-events: none;
+  z-index: 200;
+}
+
+.hud-corner-br {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  border-bottom: 1px solid #555;
+  border-right: 1px solid #555;
+  pointer-events: none;
+  z-index: 200;
+}
+
+/* ===== Panel clip-path (Arknights cut corner) ===== */
+.panel-clip {
+  clip-path: polygon(0 0, 100% 0, 100% 88%, 94% 100%, 0 100%);
+}
+
+/* ===== Nav items ===== */
+.nav-item::before {
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 2px;
+  background: var(--ak-yellow);
+  margin-right: 0;
+  vertical-align: middle;
+  transition: width 0.2s, margin-right 0.2s;
+}
+
+.nav-item:hover::before {
+  width: 16px;
+  margin-right: 8px;
+}
+
+/* ===== Gallery/Log mode toggle ===== */
+.mode-toggle-btn {
+  font-family: monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border: 1px solid #333;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mode-toggle-btn.active {
+  background: var(--ak-yellow);
+  color: #000;
+  border-color: var(--ak-yellow);
+  font-weight: 700;
+  box-shadow: var(--ak-yellow-glow);
+}
+
+.mode-toggle-btn:not(.active):hover {
+  border-color: #555;
+  color: #aaa;
+}
+
+/* ===== Lightbox ===== */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.lightbox.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 1px solid #444;
+  color: #888;
+  font-size: 24px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lightbox-nav:hover {
+  border-color: var(--ak-yellow);
+  color: var(--ak-yellow);
+}
+
+.lightbox-nav.prev { left: 20px; }
+.lightbox-nav.next { right: 20px; }
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: 1px solid #444;
+  color: #888;
+  font-size: 18px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: monospace;
+}
+
+.lightbox-close:hover {
+  border-color: var(--ak-yellow);
+  color: var(--ak-yellow);
+}
+
+/* ===== Admin panel ===== */
+.admin-input {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid #333;
+  color: #ccc;
+  padding: 8px 12px;
+  width: 100%;
+  font-family: monospace;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.admin-input:focus {
+  border-color: var(--ak-yellow);
+}
+
+.admin-textarea {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid #333;
+  color: #ccc;
+  padding: 8px 12px;
+  width: 100%;
+  font-family: monospace;
+  font-size: 13px;
+  outline: none;
+  resize: vertical;
+  min-height: 200px;
+  transition: border-color 0.2s;
+}
+
+.admin-textarea:focus {
+  border-color: var(--ak-yellow);
+}
+
+.admin-btn {
+  background: var(--ak-yellow);
+  color: #000;
+  border: none;
+  padding: 8px 20px;
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-btn:hover {
+  box-shadow: var(--ak-yellow-glow);
+}
+
+.admin-btn-secondary {
+  background: transparent;
+  color: #888;
+  border: 1px solid #333;
+  padding: 8px 20px;
+  font-family: monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-btn-secondary:hover {
+  border-color: #555;
+  color: #ccc;
+}
+
+/* ===== Upload drop zone ===== */
+.drop-zone {
+  border: 2px dashed #333;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: var(--ak-yellow);
+  background: var(--ak-yellow-dim);
+}
+
+/* ===== Log mode entries ===== */
+.log-entry {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 20px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--ak-border-dim);
+  transition: background 0.2s;
+}
+
+@media (max-width: 640px) {
+  .log-entry {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Tag chips ===== */
+.tag-chip {
+  font-size: 10px;
+  font-family: monospace;
+  color: var(--ak-cyan);
+  background: var(--ak-cyan-dim);
+  padding: 2px 8px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: lowercase;
+}
+
+.tag-chip:hover,
+.tag-chip.active {
+  background: rgba(0, 229, 255, 0.25);
+  border-color: var(--ak-cyan);
+}
+
+/* ===== System log panel (right decorative panel) ===== */
+.syslog-panel {
+  font-family: monospace;
+  font-size: 9px;
+  color: #333;
+  line-height: 1.8;
+  letter-spacing: 0.5px;
+  user-select: none;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ak-yellow);
+}

@@ -7,7 +7,23 @@ services:
       - PORT=3000
     restart: unless-stopped
 
+  images:
+    build: ./images
+    ports:
+      - "3001:3001"
+    volumes:
+      # コンテンツを永続化: コンテナ再起動後もギャラリーデータが消えない
+      # 将来Cloudflare R2に移行する際はこのvolumeを削除し、storage.tsをR2Storageに切り替える
+      - ./images-data:/app/src/content/galleries
+    environment:
+      - PORT=3001
+      - ADMIN_USER=admin
+      # 本番環境では必ず変更すること: docker-compose.override.yml で上書きを推奨
+      - ADMIN_PASSWORD=changeme
+    restart: unless-stopped
+
   # Cloudflare Tunnel — 実用時は uncomment して設定する
+  # images.yourdomain.com → localhost:3001 をTunnelでルーティング
   # cloudflared:
   #   image: cloudflare/cloudflared:latest
   #   command: tunnel --config /etc/cloudflared run
@@ -15,4 +31,5 @@ services:
   #     - ~/.cloudflared:/etc/cloudflared:ro
   #   depends_on:
   #     - portfolio
+  #     - images
   #   restart: unless-stopped
